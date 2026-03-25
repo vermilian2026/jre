@@ -41,7 +41,7 @@ jobs:
           # Make an empty commit (no files are changed — exactly what you asked for)
           GIT_AUTHOR_DATE="${COMMIT_DATE}" \
           GIT_COMMITTER_DATE="${COMMIT_DATE}" \
-            git commit --allow-empty -m "🌟 Daily activity (auto-generated at random hour)"
+            git commit --allow-empty -m "🌟 Daily Updates"
 
           # Push it
           git push
