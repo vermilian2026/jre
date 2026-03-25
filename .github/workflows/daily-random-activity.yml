@@ -1,0 +1,49 @@
+name: 🌟 Daily Random GitHub Activity
+
+# Runs once per day at midnight UTC
+# Inside the job we generate a truly random hour (0-23) + minute + second
+# The commit is dated to TODAY at that random time → your contribution graph
+# will show green activity at a different random hour every day
+on:
+  schedule:
+    - cron: '0 0 * * *'   # Every day at 00:00 UTC
+  workflow_dispatch:      # Allows you to trigger manually for testing
+
+permissions:
+  contents: write
+
+jobs:
+  daily-activity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate random commit time + make empty commit
+        run: |
+          # Configure git to commit as YOU (so it counts on your contribution graph)
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+          # Generate random time TODAY in UTC
+          TODAY=$(date -u '+%Y-%m-%d')
+          HOUR=$((RANDOM % 24))
+          MINUTE=$((RANDOM % 60))
+          SECOND=$((RANDOM % 60))
+
+          # Format: 2025-03-25 14:37:22
+          COMMIT_DATE="${TODAY} ${HOUR}:${MINUTE}:${SECOND}"
+
+          echo "🚀 Creating empty commit dated: ${COMMIT_DATE} UTC"
+          echo "   (This will appear as activity at a random hour today)"
+
+          # Make an empty commit (no files are changed — exactly what you asked for)
+          GIT_AUTHOR_DATE="${COMMIT_DATE}" \
+          GIT_COMMITTER_DATE="${COMMIT_DATE}" \
+            git commit --allow-empty -m "🌟 Daily activity (auto-generated at random hour)"
+
+          # Push it
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
